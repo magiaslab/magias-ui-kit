@@ -23,7 +23,7 @@ React 19 e Tailwind 4. Il movimento richiede `gsap` 3.15 o successivo, che inclu
 
 ## Come si usa
 
-1. Copia `tokens/` in `styles/` e sostituisci i valori dei primitivi. Importa `theme.css`, `globals.css` e `motion.css` dopo `tailwindcss`.
+1. Copia `tokens/` in `styles/` e sostituisci i valori dei primitivi. Importa `theme.css`, `globals.css` e `motion.css` dopo `tailwindcss`. Su un sito che ha già i suoi token, porta almeno le classi `.m-*` di `motion.css` (link per saltare la striscia, slideshow, barra prenota): senza, il link «Salta» resta sempre visibile.
 2. Nel layout monta `<ScrollMotion routeKey={pathname} />` e, per il livello 2 o 3, `<SmoothScroll routeKey={pathname} />`.
 3. Nelle sezioni chiedi gli effetti con un attributo: `data-m="split"` su un h2, `data-m-scope` su un contenitore, `data-m-none` sulla prima schermata.
 4. Per l'ospitalità scrivi un adattatore del motore con `queryStringAdapter` (o uno tuo) e passalo a `BookingBar` e a ogni link Prenota. Verifica a mano quali parametri il motore accetta davvero, e dichiaralo in `supports`.

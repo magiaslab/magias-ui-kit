@@ -29,6 +29,8 @@ type Props = {
   pinnedQuery?: string;
   /** Elemento fisso sopra il pin (es. "[data-site-header]"): il pin parte sotto di lui. */
   offsetSelector?: string;
+  /** Parte dell'elemento fisso che scorre via (es. una riga contatti): non conta nell'offset. */
+  offsetExcludeSelector?: string;
   skipLabel?: string;
   className?: string;
   trackClassName?: string;
@@ -36,11 +38,13 @@ type Props = {
 };
 
 /** Altezza dell'elemento se è sticky o fixed, altrimenti 0. Una prop stringa: passa anche da un componente server. */
-function offsetOf(selector?: string): number {
+function offsetOf(selector?: string, exclude?: string): number {
   const el = selector ? document.querySelector<HTMLElement>(selector) : null;
   if (!el) return 0;
   const position = getComputedStyle(el).position;
-  return position === "sticky" || position === "fixed" ? el.offsetHeight : 0;
+  if (position !== "sticky" && position !== "fixed") return 0;
+  const away = exclude ? el.querySelector<HTMLElement>(exclude) : null;
+  return el.offsetHeight - (away?.offsetHeight ?? 0);
 }
 
 export function HorizontalStrip({
@@ -51,6 +55,7 @@ export function HorizontalStrip({
   children,
   pinnedQuery = "(min-width: 64rem)",
   offsetSelector,
+  offsetExcludeSelector,
   skipLabel = "Salta questa sezione",
   className,
   trackClassName,
@@ -75,7 +80,7 @@ export function HorizontalStrip({
           const tween = gsap.to(t, {
             x: () => -distance(),
             ease: "none",
-            scrollTrigger: { trigger: s, start: () => `top ${offsetOf(offsetSelector)}px`, end: () => `+=${distance()}`, pin: true, scrub: 0.6, invalidateOnRefresh: true },
+            scrollTrigger: { trigger: s, start: () => `top ${offsetOf(offsetSelector, offsetExcludeSelector)}px`, end: () => `+=${distance()}`, pin: true, scrub: 0.6, invalidateOnRefresh: true },
           });
           let frame = 0;
           const onFocus = (e: FocusEvent) => {
@@ -103,7 +108,7 @@ export function HorizontalStrip({
           delete s.dataset.mPinned;
         };
       }, `(prefers-reduced-motion: no-preference) and ${pinnedQuery}`),
-    [pinnedQuery, offsetSelector],
+    [pinnedQuery, offsetSelector, offsetExcludeSelector],
   );
 
   return (
