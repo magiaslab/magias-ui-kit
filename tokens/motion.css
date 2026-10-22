@@ -47,11 +47,6 @@
   color: var(--color-ink);
 }
 
-/* Striscia orizzontale: la versione nativa scatta per elemento. */
-[data-m-pinned] > div > * {
-  scroll-snap-align: none;
-}
-
 /* Slideshow */
 .m-slide {
   position: absolute;

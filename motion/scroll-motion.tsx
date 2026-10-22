@@ -18,7 +18,10 @@ import { duration, easeFn } from "./tokens";
  *   data-m="draw"           <svg>: le <line> dirette si disegnano, poi compare il resto
  *   data-m="parallax"       immagine più lenta del riquadro; data-m-amount="0.12"
  *   data-m="zoom"           zoom che si assesta; data-m-amount="0.16"
- *   data-m-scope            contenitore: i suoi p, li, figure, h3… entrano come reveal
+ *   data-m="curtain"        riquadro con foto che si apre dal centro
+ *   data-m="expand"         foto a tutta larghezza che si allarga ai bordi (da md)
+ *   data-m-scope            contenitore: i suoi p, li, figure, h3… entrano come reveal,
+ *                           e i suoi h2 riga per riga se autoSplit è attivo
  *   data-m-none             esclude un ramo (prima schermata, dialog)
  *
  * Regole del motore:
@@ -39,25 +42,26 @@ const EXCLUDED = "[data-m-none], [role=dialog], [data-radix-popper-content-wrapp
 type Props = {
   /** Cambia a ogni pagina (es. il pathname): il motore riparte da capo. */
   routeKey?: string;
+  /** Selettore dei titoli da dividere in righe dentro data-m-scope, es. "h2". */
+  autoSplit?: string;
 };
 
-export function ScrollMotion({ routeKey }: Props) {
+export function ScrollMotion({ routeKey, autoSplit }: Props) {
   useEffect(() => {
-    let cancelIdle: (() => void) | undefined;
     let stop: (() => void) | undefined;
-    cancelIdle = whenIdle(() => {
-      stop = whileMotionAllowed(start);
+    const cancelIdle = whenIdle(() => {
+      stop = whileMotionAllowed(() => start(autoSplit));
     });
     return () => {
-      cancelIdle?.();
+      cancelIdle();
       stop?.();
     };
-  }, [routeKey]);
+  }, [routeKey, autoSplit]);
 
   return null;
 }
 
-async function start(): Promise<() => void> {
+async function start(autoSplit?: string): Promise<() => void> {
   const { gsap, ScrollTrigger, SplitText } = await loadGsap();
   // SplitText misura le righe con il carattere definitivo.
   await document.fonts.ready;
@@ -72,8 +76,9 @@ async function start(): Promise<() => void> {
   const ease = easeFn("editorial");
   const ctx = gsap.context(() => {
     // --- Titoli riga per riga -------------------------------------------------------
-    declared("split")
-      .filter((el) => el.tagName !== "H1" && !inViewAtLoad(el))
+    const autoTitles = autoSplit ? all("[data-m-scope]").flatMap((s) => [...s.querySelectorAll<HTMLElement>(autoSplit)].filter((el) => free(el) && !el.dataset.m)) : [];
+    const splitTargets = new Set([...declared("split"), ...autoTitles].filter((el) => el.tagName !== "H1" && !inViewAtLoad(el)));
+    [...splitTargets]
       .forEach((el) => {
         SplitText.create(el, {
           type: "lines",
@@ -97,7 +102,7 @@ async function start(): Promise<() => void> {
     const scoped = all("[data-m-scope]").flatMap((scope) => [...scope.querySelectorAll<HTMLElement>(AUTO_BLOCKS)].filter(free));
     const candidates = [...new Set([...declared("reveal"), ...scoped])].filter(
       // Un elemento con un altro effetto dichiarato non riceve anche il reveal.
-      (el) => !el.dataset.m || el.dataset.m === "reveal",
+      (el) => (!el.dataset.m || el.dataset.m === "reveal") && !splitTargets.has(el) && !el.closest('[data-m="split"]'),
     );
     const set = new Set(candidates);
     // Solo il più esterno di ogni gruppo: una card, non anche il suo testo.
@@ -146,6 +151,37 @@ async function start(): Promise<() => void> {
           { clipPath: "inset(0% 0% 0% 0%)", ease: "none", clearProps: "clipPath", scrollTrigger: { trigger: el, start: "top 92%", end: "top 55%", scrub: 0.6 } },
         );
       });
+
+    // --- Sipario: il riquadro si apre dal centro -------------------------------------------
+    declared("curtain")
+      .filter((el) => !inViewAtLoad(el))
+      .forEach((el) => {
+        // Una lettura per riquadro all'avvio, non a ogni frame.
+        const radius = getComputedStyle(el).borderRadius || "0px";
+        gsap.fromTo(
+          el,
+          { clipPath: `inset(12% 10% 12% 10% round ${radius})`, opacity: 0.2 },
+          {
+            clipPath: `inset(0% 0% 0% 0% round ${radius})`,
+            opacity: 1,
+            duration: duration("long"),
+            ease,
+            clearProps: "clipPath,opacity",
+            scrollTrigger: { trigger: el, start: START, once: true },
+          },
+        );
+      });
+
+    // --- Foto che si allarga ai bordi (da md: sul telefono è già a tutto schermo) -----------
+    if (window.matchMedia("(min-width: 48rem)").matches) {
+      declared("expand").forEach((el) => {
+        gsap.fromTo(
+          el,
+          { clipPath: "inset(0% 7% 0% 7% round 10px)" },
+          { clipPath: "inset(0% 0% 0% 0% round 0px)", ease: "none", scrollTrigger: { trigger: el, start: "top 90%", end: "top 25%", scrub: 0.6 } },
+        );
+      });
+    }
 
     // --- Filetti ---------------------------------------------------------------------------
     declared("line").forEach((el) => {

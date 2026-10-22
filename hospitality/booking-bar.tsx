@@ -65,7 +65,9 @@ export function BookingBar({ engine, context, limits, labels = { bar: BAR_LABELS
       className={className}
       onFocus={() => setActive(true)}
       onBlur={(e) => {
-        if (!e.currentTarget.contains(e.relatedTarget as Node)) setActive(false);
+        // I popover stanno in un portale fuori dal form: il focus lì conta come dentro.
+        const next = e.relatedTarget as Element | null;
+        if (!next || (!e.currentTarget.contains(next) && !next.closest?.("[data-radix-popper-content-wrapper]"))) setActive(false);
       }}
       onSubmit={(e) => e.preventDefault()}
     >

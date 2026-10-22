@@ -33,7 +33,22 @@ I testi dei componenti sono in italiano e si sostituiscono con la prop `labels`.
 ## Verifiche
 
 - `npm run check`: controllo dei tipi di tutti i file, con stub dei componenti shadcn.
-- I componenti non sono ancora stati provati insieme in un sito. La validazione su un progetto reale, con tastiera, lettore di schermo, movimento ridotto cambiato a pagina aperta e misure delle prestazioni, è il prossimo passo e il suo esito andrà scritto qui.
+- `node scripts/check-design-doc.mjs docs/DESIGN-SYSTEM.md app components lib styles`: documento del design system contro il codice.
+
+### Validazione su un sito (22 ottobre 2026)
+
+Motore del movimento e striscia orizzontale montati su una bozza di sito per un hotel (Next 16, livello di movimento 2), al posto del motore da cui il kit era nato. Build di produzione, Chrome headless, 13 prove su 13 superate:
+
+- senza JavaScript non resta nulla nascosto;
+- con riduci movimento all'avvio Lenis non parte e niente resta in attesa; attivato a pagina aperta, scroll fluido, effetti e video si spengono e tutto torna visibile;
+- un blocco in attesa che riceve il focus compare;
+- striscia bloccata a 1366 px: il Tab porta in vista ogni card, c'è il link per saltarla; a 390 px è nativa, senza Lenis e senza video;
+- video dell'hero fermo fuori vista e mentre si usa il calendario, poi riparte; `preload="metadata"`;
+- contatori degli ospiti al limite: niente `disabled`, focus conservato, limite annunciato;
+- prima schermata: nessun ritardo oltre 300 ms, titolo intero per i lettori di schermo;
+- LCP e CLS in laboratorio su telefono emulato (CPU 4×, 1,6 Mbit/s) sotto le soglie di PF01.
+
+Restano da fare: VoiceOver e NVDA, un telefono vero, Lighthouse e dati di campo. La validazione ha portato a questi cambi nel kit: effetti `curtain` ed `expand`, titoli h2 automatici dentro `data-m-scope` (`autoSplit`), striscia con titolo e azione dentro la sezione e offset da selettore (una funzione non passa da un componente server), sospensione che tiene conto dei popover in un portale, controllo del documento esteso ad attributi e file.
 
 ## Licenza
 
