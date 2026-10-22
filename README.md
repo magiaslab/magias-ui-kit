@@ -50,6 +50,10 @@ Motore del movimento e striscia orizzontale montati su una bozza di sito per un 
 
 Restano da fare: VoiceOver e NVDA, un telefono vero, Lighthouse e dati di campo. La validazione ha portato a questi cambi nel kit: effetti `curtain` ed `expand`, titoli h2 automatici dentro `data-m-scope` (`autoSplit`), striscia con titolo e azione dentro la sezione e offset da selettore (una funzione non passa da un componente server), sospensione che tiene conto dei popover in un portale, controllo del documento esteso ad attributi e file.
 
+### Seconda validazione (22 ottobre 2026)
+
+Stesso motore su una bozza di sito per appartamenti vacanza (Next 16, tre lingue, video in apertura, piante in SVG), senza striscia orizzontale. 13 prove su 13: oltre a quelle sopra, un solo effetto per foto, maschere dei titoli allargate, niente in attesa in fondo alla pagina, `data-track` mai insieme a `data-m`. Il confronto con il motore che sostituiva ha mostrato tre cose che il kit aveva perso, ora rimesse: la maschera dei titoli allargata (le lettere con la gamba in giù restavano tagliate), i blocchi dell'ultima schermata che partono appena entrano, il CSS di Lenis. Nuova prop `extraBlocks` per far entrare altri blocchi, come i pulsanti del sito. Riprovato anche il primo sito: 14 su 14.
+
 ## Licenza
 
 MIT. Vedi [LICENSE](LICENSE).

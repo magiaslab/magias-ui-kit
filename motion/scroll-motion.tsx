@@ -44,24 +44,26 @@ type Props = {
   routeKey?: string;
   /** Selettore dei titoli da dividere in righe dentro data-m-scope, es. "h2". */
   autoSplit?: string;
+  /** Altri blocchi da far entrare dentro data-m-scope, es. i pulsanti del sito. */
+  extraBlocks?: string;
 };
 
-export function ScrollMotion({ routeKey, autoSplit }: Props) {
+export function ScrollMotion({ routeKey, autoSplit, extraBlocks }: Props) {
   useEffect(() => {
     let stop: (() => void) | undefined;
     const cancelIdle = whenIdle(() => {
-      stop = whileMotionAllowed(() => start(autoSplit));
+      stop = whileMotionAllowed(() => start(autoSplit, extraBlocks));
     });
     return () => {
       cancelIdle();
       stop?.();
     };
-  }, [routeKey, autoSplit]);
+  }, [routeKey, autoSplit, extraBlocks]);
 
   return null;
 }
 
-async function start(autoSplit?: string): Promise<() => void> {
+async function start(autoSplit?: string, extraBlocks?: string): Promise<() => void> {
   const { gsap, ScrollTrigger, SplitText } = await loadGsap();
   // SplitText misura le righe con il carattere definitivo.
   await document.fonts.ready;
@@ -87,19 +89,26 @@ async function start(autoSplit?: string): Promise<() => void> {
           // aria-label sull'elemento e righe aria-hidden: il lettore di schermo legge
           // il titolo intero, non a pezzi (MV03).
           aria: "auto",
-          onSplit: (self) =>
-            gsap.from(self.lines, {
-              yPercent: 110,
+          onSplit: (self) => {
+            // La maschera è alta quanto l'interlinea, stretta nei titoli: le discendenti
+            // (g, p) restavano tagliate anche ad animazione finita. Si allarga la maschera
+            // e si compensa col margine negativo: la riga non si sposta di un pixel.
+            gsap.set(self.masks, { paddingTop: "0.12em", paddingBottom: "0.3em", marginTop: "-0.12em", marginBottom: "-0.3em" });
+            return gsap.from(self.lines, {
+              // Più di 110: la maschera ora scende di 0,3em sotto la riga.
+              yPercent: 140,
               duration: duration("long"),
               ease,
               stagger: 0.08,
               scrollTrigger: { trigger: el, start: START, once: true },
-            }),
+            });
+          },
         });
       });
 
     // --- Blocchi -----------------------------------------------------------------------
-    const scoped = all("[data-m-scope]").flatMap((scope) => [...scope.querySelectorAll<HTMLElement>(AUTO_BLOCKS)].filter(free));
+    const blockSelector = extraBlocks ? `${AUTO_BLOCKS}, ${extraBlocks}` : AUTO_BLOCKS;
+    const scoped = all("[data-m-scope]").flatMap((scope) => [...scope.querySelectorAll<HTMLElement>(blockSelector)].filter(free));
     const candidates = [...new Set([...declared("reveal"), ...scoped])].filter(
       // Un elemento con un altro effetto dichiarato non riceve anche il reveal.
       (el) => (!el.dataset.m || el.dataset.m === "reveal") && !splitTargets.has(el) && !el.closest('[data-m="split"]'),
@@ -125,7 +134,12 @@ async function start(autoSplit?: string): Promise<() => void> {
         overwrite: true,
       });
     };
-    ScrollTrigger.batch(blocks, { start: START, once: true, onEnter: show });
+    // Nell'ultima schermata il bordo alto di un blocco non arriva mai all'88%: quei
+    // blocchi (le ultime righe, il footer) partono appena entrano.
+    const maxScroll = ScrollTrigger.maxScroll(window);
+    const reachable = (el: Element) => el.getBoundingClientRect().top + window.scrollY - vh() * 0.88 <= maxScroll;
+    ScrollTrigger.batch(blocks.filter(reachable), { start: START, once: true, onEnter: show });
+    ScrollTrigger.batch(blocks.filter((el) => !reachable(el)), { start: "top 98%", once: true, onEnter: show });
     // Un blocco in attesa che riceve il focus compare subito (MV04).
     const onFocus = (e: FocusEvent) => {
       const block = blocks.find((b) => b.contains(e.target as Node));

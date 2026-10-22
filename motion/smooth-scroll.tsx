@@ -1,6 +1,8 @@
 // Client: scroll fluido con Lenis, agganciato al ticker di GSAP, montato una volta nel layout.
 "use client";
 
+// Regole di Lenis (scroll-behavior, pannelli con data-lenis-prevent, pagina ferma).
+import "lenis/dist/lenis.css";
 import { useEffect } from "react";
 import { loadGsap } from "./gsap";
 import { QUERY_FINE_POINTER, QUERY_MOTION_OK, whileMotionAllowed } from "./preferences";
