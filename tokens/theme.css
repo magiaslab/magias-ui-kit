@@ -1,0 +1,132 @@
+/*
+ * Token di partenza (G01). Si copia nel progetto e si sostituiscono i valori; la
+ * struttura resta. Due livelli:
+ * - primitivi (--color-neutro-*, --color-marca-*…): mai usati nei componenti;
+ * - semantici (surface, ink, line, cta, focus…): gli unici nei componenti.
+ * --color-*: initial azzera la palette di Tailwind, così un colore fuori sistema non
+ * compila. Ogni coppia testo/fondo va in docs/DESIGN-SYSTEM.md con il contrasto
+ * calcolato e le coppie vietate.
+ */
+
+@theme {
+  --color-*: initial;
+
+  /* ---- Primitivi: valori d'esempio, da sostituire ---- */
+  --color-neutro-0: oklch(100% 0 0);
+  --color-neutro-50: oklch(98% 0.006 80);
+  --color-neutro-100: oklch(94% 0.018 80);
+  --color-neutro-300: oklch(86% 0.028 78);
+  --color-neutro-400: oklch(74% 0.035 78);
+  --color-neutro-500: oklch(56% 0.02 60);
+  --color-neutro-700: oklch(42% 0.014 357);
+  --color-neutro-900: oklch(26% 0.01 355);
+  --color-marca-100: oklch(94% 0.035 65);
+  --color-marca-400: oklch(77% 0.15 57);
+  --color-marca-700: oklch(51% 0.138 46);
+  --color-guida-700: oklch(43.6% 0.124 259);
+
+  /* Solo per components/ui (overlay di shadcn). */
+  --color-black: #000;
+  --color-white: #fff;
+  --color-transparent: transparent;
+  --color-current: currentColor;
+
+  /* ---- Semantici ---- */
+  --color-surface: var(--color-neutro-50);
+  --color-surface-raised: var(--color-neutro-0);
+  --color-surface-muted: var(--color-neutro-100);
+  --color-surface-inverse: var(--color-neutro-900);
+  --color-ink: var(--color-neutro-900);
+  --color-ink-muted: var(--color-neutro-700);
+  --color-ink-inverse: var(--color-neutro-0);
+  --color-accent: var(--color-marca-400);
+  --color-accent-soft: var(--color-marca-100);
+  --color-accent-ink: var(--color-marca-700);
+  /* Filetti decorativi: non per bordi di controlli o contenitori cliccabili (A02). */
+  --color-line: var(--color-neutro-300);
+  /* Bordi di controlli e card: almeno 3:1 sul fondo. */
+  --color-line-strong: var(--color-neutro-400);
+  --color-line-input: var(--color-neutro-500);
+  /* L'azione principale: un solo pulsante con questo peso per gruppo decisionale. */
+  --color-cta: var(--color-marca-400);
+  --color-cta-foreground: var(--color-neutro-900);
+  --color-focus: var(--color-guida-700);
+  --color-focus-inverse: var(--color-marca-100);
+  --color-danger: oklch(48.5% 0.15 28);
+
+  /* ---- Tipografia: i font arrivano da next/font o @font-face con licenza documentata ---- */
+  --font-display: var(--font-titoli, Georgia), serif;
+  --font-body: var(--font-testo, system-ui), sans-serif;
+  --font-sans: var(--font-body);
+
+  /* ---- Layout ---- */
+  --breakpoint-sm: 30rem;
+  --breakpoint-md: 48rem;
+  --breakpoint-lg: 64rem;
+  --breakpoint-xl: 80rem;
+  --container-page: 1320px;
+  --container-text: 760px;
+
+  /* ---- Forma ---- */
+  --radius-sm: 2px;
+  --radius-md: 6px;
+  --radius-pill: 999px;
+  --radius-media: 6px;
+
+  /* ---- Movimento: letti anche da motion/tokens.ts ---- */
+  --ease-out-soft: cubic-bezier(0.16, 0.68, 0.28, 1);
+  --ease-editorial: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+}
+
+:root {
+  /* Durate: le stesse per CSS e GSAP (motion/tokens.ts). */
+  --duration-fast: 150ms;
+  --duration-base: 250ms;
+  --duration-slow: 400ms;
+  --duration-editorial: 700ms;
+  --duration-long: 1100ms;
+
+  --measure-prose: 66ch;
+  --space-section-y: clamp(4rem, 2.8rem + 6vw, 9rem);
+  --space-gutter: clamp(1rem, 0.4rem + 3vw, 4rem);
+
+  /* Bersaglio minimo per il tocco (A05 raccomanda 44 px). */
+  --size-tap-min: 44px;
+  /* Altezze che riservano spazio: header, barra prenota mobile, banner consenso (PF04). */
+  --size-header-h: 4rem;
+  --size-bookingbar-h: 4.5rem;
+  --size-consent-h: 0px;
+}
+
+/* Scala tipografica fluida: un esempio per livello, gli altri seguono lo stesso schema. */
+@utility type-display-lg {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 1.6rem + 3.6vw, 4.75rem);
+  line-height: 1.04;
+  letter-spacing: -0.015em;
+}
+@utility type-heading-md {
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.25rem + 1vw, 2rem);
+  line-height: 1.15;
+}
+@utility type-body {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+}
+@utility type-ui {
+  font-size: 1rem;
+  line-height: 1.2;
+  font-weight: 500;
+}
+@utility measure-prose {
+  max-width: var(--measure-prose);
+}
+@utility gutter-x {
+  padding-inline: var(--space-gutter);
+}
+@utility tap-min {
+  min-width: var(--size-tap-min);
+  min-height: var(--size-tap-min);
+}

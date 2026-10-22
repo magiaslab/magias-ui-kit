@@ -1,0 +1,118 @@
+/*
+ * Movimento solo CSS e classi dei componenti del kit.
+ *
+ * Prima schermata (MV03): il testo è visibile al primo disegno. L'apertura si muove solo
+ * in CSS, dentro prefers-reduced-motion: no-preference, parte da opacità piena e non
+ * nasconde nulla oltre 300 ms. Nessuna classe da togliere con JavaScript.
+ */
+@media (prefers-reduced-motion: no-preference) {
+  .m-hero-settle {
+    animation: m-settle var(--duration-long) var(--ease-editorial) both;
+  }
+  .m-hero-rise {
+    animation: m-rise var(--duration-slow) var(--ease-out-soft) both;
+  }
+  @keyframes m-settle {
+    from { transform: scale(1.04); }
+    to { transform: none; }
+  }
+  @keyframes m-rise {
+    from { transform: translateY(0.4em); opacity: 0.6; }
+    to { transform: none; opacity: 1; }
+  }
+  @view-transition {
+    navigation: auto;
+  }
+}
+
+/* Link per saltare una sezione: visibile solo quando riceve il focus. */
+.m-skip-link {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.m-skip-link:focus {
+  position: fixed;
+  top: calc(var(--size-header-h) + 0.5rem);
+  left: 1rem;
+  z-index: 60;
+  width: auto;
+  height: auto;
+  clip-path: none;
+  padding: 0.75rem 1rem;
+  background: var(--color-surface-raised);
+  color: var(--color-ink);
+}
+
+/* Striscia orizzontale: la versione nativa scatta per elemento. */
+[data-m-pinned] > div > * {
+  scroll-snap-align: none;
+}
+
+/* Slideshow */
+.m-slide {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+}
+.m-slide[data-active] {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .m-slide {
+    transition: opacity var(--duration-long) var(--ease-inout);
+  }
+}
+
+/* Scena WebGL: quando gira, il fallback visivo si nasconde ma il testo resta leggibile. */
+[data-m-scene="running"] .m-scene-fallback [data-m-scene-visual] {
+  visibility: hidden;
+}
+
+/* Barra prenota mobile: fissa, sopra il consenso, nell'area sicura. */
+.m-mobile-booking-bar {
+  position: fixed;
+  inset-inline: 0;
+  bottom: var(--size-consent-h);
+  z-index: 40;
+  padding-bottom: env(safe-area-inset-bottom);
+  background: var(--color-surface-raised);
+  border-top: 1px solid var(--color-line);
+}
+.m-mobile-booking-bar-inner {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: var(--size-bookingbar-h);
+  padding-inline: var(--space-gutter);
+}
+@media (min-width: 64rem) {
+  .m-mobile-booking-bar {
+    display: none;
+  }
+}
+
+/* Contatori e avvisi */
+.m-stepper {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.25rem 1rem;
+}
+.m-stepper-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+.m-stepper [aria-disabled="true"] {
+  opacity: 0.4;
+}
+.m-notice:empty {
+  display: none;
+}
