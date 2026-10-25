@@ -54,6 +54,10 @@ Restano da fare: VoiceOver e NVDA, un telefono vero, Lighthouse e dati di campo.
 
 Stesso motore su una bozza di sito per appartamenti vacanza (Next 16, tre lingue, video in apertura, piante in SVG), senza striscia orizzontale. 13 prove su 13: oltre a quelle sopra, un solo effetto per foto, maschere dei titoli allargate, niente in attesa in fondo alla pagina, `data-track` mai insieme a `data-m`. Il confronto con il motore che sostituiva ha mostrato tre cose che il kit aveva perso, ora rimesse: la maschera dei titoli allargata (le lettere con la gamba in giù restavano tagliate), i blocchi dell'ultima schermata che partono appena entrano, il CSS di Lenis. Nuova prop `extraBlocks` per far entrare altri blocchi, come i pulsanti del sito. Riprovato anche il primo sito: 14 su 14.
 
+### Terza validazione (22 ottobre 2026)
+
+Stesso motore e striscia orizzontale su una bozza di sito per un agriturismo (Next 16, tre lingue, slideshow con Ken Burns nell'apertura). 16 prove su 16: oltre a quelle sopra, slideshow fermo fuori vista, a scheda nascosta e mentre si scelgono le date, nessun avanzamento automatico sul telefono, nessuna animazione infinita, zoom dell'apertura breve e una volta sola. Nuova prop `offsetExcludeSelector` della striscia, per non contare una riga dell'header che scorre via. Se mancano le classi `.m-*` di `tokens/motion.css`, il link per saltare la striscia resta sempre visibile: va importato.
+
 ## Licenza
 
 MIT. Vedi [LICENSE](LICENSE).
