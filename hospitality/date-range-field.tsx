@@ -3,9 +3,18 @@
 
 import type { Ref } from "react";
 import type { DateRange } from "react-day-picker";
+import { de, enUS, fr, it, nl } from "react-day-picker/locale";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { formatShortDate, fromIsoDate, nights as countNights, startOfToday, toIsoDate } from "./dates";
+
+// Lingua del calendario (mesi, giorni, inizio settimana): senza, react-day-picker è in inglese.
+const DAY_PICKER_LOCALES = { it, en: enUS, de, fr, nl } as const;
+
+/** Accetta anche «it-IT» o «en_GB»: conta la lingua. */
+function dayPickerLocale(locale: string) {
+  return DAY_PICKER_LOCALES[locale.slice(0, 2).toLowerCase() as keyof typeof DAY_PICKER_LOCALES] ?? enUS;
+}
 
 export const DATE_LABELS = {
   dates: "Date",
@@ -82,6 +91,7 @@ export function DateRangeField({
         <PopoverContent align="start" collisionPadding={{ top: 16, right: 16, bottom: 88, left: 16 }} data-lenis-prevent>
           <Calendar
             mode="range"
+            locale={dayPickerLocale(locale)}
             numberOfMonths={months}
             min={1}
             selected={selected}

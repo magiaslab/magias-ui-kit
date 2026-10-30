@@ -1,6 +1,6 @@
 # Problemi corretti nel kit
 
-Il kit nasce dal codice di alcuni siti recenti costruiti con lo stesso design system. In quei siti sono emersi tredici problemi ricorrenti. Qui c'è dove il kit li corregge e quale regola del protocollo ([Magias UI Protocol](https://github.com/magiaslab/magias-ui-protocol) v0.3) li copre.
+Il kit nasce dal codice di alcuni siti recenti costruiti con lo stesso design system. In quei siti sono emersi tredici problemi ricorrenti, più quelli trovati dopo. Qui c'è dove il kit li corregge e quale regola del protocollo ([Magias UI Protocol](https://github.com/magiaslab/magias-ui-protocol) v0.3) li copre.
 
 | # | Problema | Dove si corregge | Regola |
 |---|---|---|---|
@@ -17,3 +17,4 @@ Il kit nasce dal codice di alcuni siti recenti costruiti con lo stesso design sy
 | 11 | Attributi del movimento in conflitto con quelli del tracciamento | Prefisso unico `data-m-*` | ML02 |
 | 12 | Documento del design system che cita componenti inesistenti | `scripts/check-design-doc.mjs`, da mettere in CI | G04 |
 | 13 | Contatori degli ospiti `disabled` al limite: il focus si perde | `hospitality/guests-field.tsx`: `aria-disabled` e annuncio del limite | H13 |
+| 14 | Calendario delle date in inglese anche su un sito in italiano | `hospitality/date-range-field.tsx`: lingua di react-day-picker presa da `locale` (it, en, de, fr, nl) | H01 |
