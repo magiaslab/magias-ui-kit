@@ -67,11 +67,12 @@ export function HorizontalStrip({
 
   useEffect(
     () =>
-      whileMotionAllowed(async () => {
+      whileMotionAllowed(async (alive) => {
         const s = section.current;
         const t = track.current;
         if (!s || !t) return;
         const { gsap } = await loadGsap();
+        if (!alive()) return;
         const distance = () => Math.max(0, t.scrollWidth - t.clientWidth);
         if (distance() === 0) return;
         s.dataset.mPinned = "";

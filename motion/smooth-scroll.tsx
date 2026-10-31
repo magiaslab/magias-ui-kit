@@ -33,8 +33,9 @@ type Props = {
 export function SmoothScroll({ routeKey, lerp = 0.1 }: Props) {
   useEffect(
     () =>
-      whileMotionAllowed(async () => {
+      whileMotionAllowed(async (alive) => {
         const [{ default: Lenis }, { gsap, ScrollTrigger }] = await Promise.all([import("lenis"), loadGsap()]);
+        if (!alive()) return;
         const lenis = new Lenis({
           lerp,
           anchors: true,

@@ -52,7 +52,7 @@ export function ScrollMotion({ routeKey, autoSplit, extraBlocks }: Props) {
   useEffect(() => {
     let stop: (() => void) | undefined;
     const cancelIdle = whenIdle(() => {
-      stop = whileMotionAllowed(() => start(autoSplit, extraBlocks));
+      stop = whileMotionAllowed((alive) => start(autoSplit, extraBlocks, alive));
     });
     return () => {
       cancelIdle();
@@ -63,10 +63,11 @@ export function ScrollMotion({ routeKey, autoSplit, extraBlocks }: Props) {
   return null;
 }
 
-async function start(autoSplit?: string, extraBlocks?: string): Promise<() => void> {
+async function start(autoSplit?: string, extraBlocks?: string, alive: () => boolean = () => true): Promise<() => void> {
   const { gsap, ScrollTrigger, SplitText } = await loadGsap();
   // SplitText misura le righe con il carattere definitivo.
   await document.fonts.ready;
+  if (!alive()) return () => {};
 
   const vh = () => document.documentElement.clientHeight;
   const inViewAtLoad = (el: Element) => el.getBoundingClientRect().top < vh() * 0.88;

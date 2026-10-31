@@ -50,9 +50,14 @@ export function useFinePointer(): boolean {
 /**
  * Avvia start quando il movimento è ammesso e lo ferma quando non lo è più, anche a
  * pagina aperta. start può essere asincrona (import dinamico) e restituire la pulizia.
+ *
+ * start riceve alive(): dopo ogni await, se restituisce false l'avvio è stato annullato
+ * (preferenza cambiata, componente smontato) e non va creato niente. Con lo StrictMode
+ * di React gli effetti partono due volte: senza questo controllo nascevano due istanze
+ * (es. due Lenis) e la pulizia della prima toglieva alla pagina le classi della seconda.
  */
 export function whileMotionAllowed(
-  start: () => Promise<(() => void) | void> | (() => void) | void,
+  start: (alive: () => boolean) => Promise<(() => void) | void> | (() => void) | void,
   query = QUERY_MOTION_OK,
 ): () => void {
   let stop: (() => void) | void;
@@ -62,7 +67,7 @@ export function whileMotionAllowed(
     stop?.();
     stop = undefined;
     if (!ok) return;
-    const cleanup = await start();
+    const cleanup = await start(() => current === generation);
     // Nel frattempo la preferenza è cambiata o il componente è stato smontato.
     if (current !== generation) cleanup?.();
     else stop = cleanup;
